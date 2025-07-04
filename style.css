@@ -1,0 +1,74 @@
+/* メイン画像の表示スタイル */
+#dogImg {
+  width: 500px;
+  height: auto;
+  display: none; /* ← 初期は非表示 */
+  margin: 20px auto;
+  background-color: #f0f0f0;
+  min-height: 300px;
+}
+
+/* 「犬を表示」ボタンのスタイル */
+#btn {
+  font-size: 1.4em;
+  padding: 15px 40px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  /* 画面下部中央に固定配置 */
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* ボタンのホバー時スタイル */
+#btn:hover {
+  background-color: #0056b3;
+}
+
+/* 「ギャラリービュー」ボタンのスタイル */
+#toggleModeBtn {
+  position: fixed;
+  top: 20px; /* 画面上からの距離 */
+  left: 20px; /* 画面右からの距離 */
+  z-index: 15; /* モーダル等より前に出す場合は値を高く */
+}
+
+#galleryWrapper{
+	display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  height: 100vh; /* 高さで中央寄せ */
+	  position: fixed; /* ← ★追加：スクロール位置によらず中央固定 */
+	  inset: 0; /* 全画面に拡張 */
+	  background-color: white; /* 必要なら背景 */
+	  z-index: 5; /* 背景画像や他要素より前に */
+	  gap: 16px;
+	  flex-wrap: wrap;
+	  padding: 20px;
+}
+
+#galleryContainer{
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+}
+
+/* エラーメッセージの装飾 */
+#errorMsg {
+  font-size: 1.2em;
+  color: #b00020;
+  background-color: #ffe6e6;
+  padding: 12px;
+  margin-top: 20px;
+  border-radius: 6px;
+  display: none;
+}

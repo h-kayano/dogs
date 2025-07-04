@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>犬画像ビューア</title>
+
+  <!-- CSSファイルの読み込み -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- JavaScriptの読み込み（deferでHTML解析後に実行） -->
+  <script src="main.js" defer></script>
+</head>
+<body>
+
+  <!-- エラーメッセージ表示エリア（通常は非表示） -->
+  <div id="errorMsg" style="display: none; color: red; text-align: center;"></div>
+
+  <!-- 通常モードの画像表示 -->
+  <img id="dogImg" />
+
+  <!-- 「犬を表示」ボタン -->
+  <button id="btn">犬を表示</button>
+
+  <!-- モード切り替えボタン -->
+  <button id="toggleModeBtn">ギャラリーモードに切り替え</button>
+
+  <!-- ギャラリーモード -->
+  <div id="galleryWrapper" style="display: none; align-items: center; justify-content: center;">
+	<!-- 左矢印ボタン -->
+	<button id="leftBtn">&lt;</button>
+
+	<!-- サムネイルを並べる領域 -->
+	<div id="galleryContainer" style="display: flex; gap: 10px;"></div>
+
+	<!-- 右矢印ボタン -->
+	<button id="rightBtn">&gt;</button>
+  </div>
+
+  <!-- モーダルで拡大画像を表示するためのオーバーレイ -->
+  <div id="modalOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 20;">
+    <img id="modalImg" style="max-width: 90%; max-height: 90%; border-radius: 10px;" />
+  </div>
+
+</body>
+</html>
