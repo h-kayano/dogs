@@ -1,2 +1,6 @@
 # dogs
-practice code. dogs only
+copilot先生に教わりながら作りました。
+写真の表示モードをいろいろ考える練習用です。
+
+このプロジェクトで使用している犬の画像は、以下のサイトよりお借りしています。
+- 画像元: [Dog API by Dog CEO](https://dog.ceo/)
