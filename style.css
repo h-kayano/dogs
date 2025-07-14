@@ -9,6 +9,14 @@
 	min-height: 300px;
 }
 
+#progressBar {
+	height: 100%;
+	width: 0%;
+	background: #007bff;
+	border-radius: 6px;
+	transition: width 0.3s ease-in-out;
+}
+
 /* 「犬を表示」ボタンのスタイル */
 #btn {
 	font-size: 1.4em;
@@ -64,8 +72,8 @@
 	border-color: transparent transparent transparent #007bff;
 	right: 20px;
 }
-d
-#galleryWrapper {
+
+d #galleryWrapper {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -83,11 +91,11 @@ d
 }
 
 #galleryContainer {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    width: 100%;
+	display: flex;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	width: 100%;
 }
 
 
@@ -105,9 +113,9 @@ d
 }
 
 #galleryContainer img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+	transform: scale(1.05);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 

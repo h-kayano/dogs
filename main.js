@@ -4,6 +4,9 @@ let lastImageUrl = null;
 // 現在のモード（"normal" or "gallery"）
 let mode = "normal";
 
+//読み込み開始時間
+let startTime = Date.now();
+
 // ギャラリービューで何ページ目を表示しているか
 let currentPage = 0;
 const ITEMS_PER_PAGE = 4;
@@ -77,10 +80,37 @@ function toggleMode(currentMode) {
 	}
 }
 
+function updateProgressBarTimed() {
+	const wrapper = document.getElementById("progressWrapper"); // ← これが必要！
+	const bar = document.getElementById("progressBar");
+
+	const TOTAL_LOAD_DURATION = 3000;// 読み込みにかかる平均時間（ミリ秒）
+	const elapsed = Date.now() - startTime;
+	const percent = Math.min(100, Math.floor((elapsed / TOTAL_LOAD_DURATION) * 100));
+	bar.style.width = percent + "%";
+
+	wrapper.style.display = "block";
+
+	if (percent < 100) {
+		// 50msごとに再更新（進捗が100%未満のうちは）
+		setTimeout(updateProgressBarTimed, 50);// ← 再帰更新
+	} else {
+		// 読み込み完了後にバー非表示
+		setTimeout(() => {
+			wrapper.style.display = "none";
+		}, 500);
+	}
+}
+
 function showBufferedImage() {
 	if (preloadQueue.length === 0) {
 		errorMsg.textContent = "画像を準備中です…！少々お待ちを🐶";
 		errorMsg.style.display = "block";
+
+		// タイマー初期化＋バー進行開始
+		startTime = Date.now();
+		updateProgressBarTimed();
+
 		return;
 	}
 
@@ -106,6 +136,7 @@ function showBufferedImage() {
 
 // 画像を事前に取得してバッファに詰める
 async function fillPreloadBuffer() {
+
 	// 並列で画像の事前取得する関数
 	const fetchImage = async () => {
 		try {
@@ -115,7 +146,7 @@ async function fillPreloadBuffer() {
 			// 無効な形式や重複画像はスキップ
 			if (
 				!data.url ||
-				data.url == lastImageUrl ||
+				data.url === lastImageUrl ||
 				data.url.endsWith(".mp4") ||
 				data.url.endsWith(".webm") ||
 				data.url.endsWith(".gif")
@@ -141,7 +172,9 @@ async function fillPreloadBuffer() {
 
 	const results = await Promise.all(tasks);
 	results.forEach(img => {
-		if (img) preloadQueue.push(img);
+		if (img) {
+			preloadQueue.push(img);
+		}
 	});
 
 	// バッファに最低1枚あればメッセージを非表示
@@ -248,8 +281,16 @@ function showModal(src) {
 }
 
 window.addEventListener("load", async () => {
+
 	// 初期モードのUIを整える（ラベル更新含む）
 	toggleMode(mode);
+
+	// ✅ 初期ロードメッセージとバー表示
+	errorMsg.textContent = "画像を準備中です…！少々お待ちを🐶";
+	errorMsg.style.display = "block";
+
+	startTime = Date.now();// ← タイマー初期化
+	updateProgressBarTimed();// ← バーの進行スタート！
 
 	// バッファを埋めて最初の画像を表示
 	await fillPreloadBuffer();
