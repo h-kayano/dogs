@@ -106,28 +106,45 @@ function showBufferedImage() {
 
 // 画像を事前に取得してバッファに詰める
 async function fillPreloadBuffer() {
-	while (preloadQueue.length < BUFFER_SIZE) {
-		const res = await fetch("https://random.dog/woof.json");
-		const data = await res.json();
+	// 並列で画像の事前取得する関数
+	const fetchImage = async () => {
+		try {
+			const res = await fetch("https://random.dog/woof.json");
+			const data = await res.json();
 
-		// 動画ファイルはスキップ（画像だけ扱う）
-		if (data.url.endsWith(".mp4") || data.url.endsWith(".webm") || data.url.endsWith(".gif")) continue;
+			// 無効な形式や重複画像はスキップ
+			if (
+				!data.url ||
+				data.url == lastImageUrl ||
+				data.url.endsWith(".mp4") ||
+				data.url.endsWith(".webm") ||
+				data.url.endsWith(".gif")
+			) return null;
 
-		// 前回と同じ画像はスキップ
-		if (data.url === lastImageUrl) continue;
+			const img = new Image();
+			img.src = data.url;
 
-		const img = new Image();
-		img.src = data.url;
+			return new Promise(resolve => {
+				img.onload = () => resolve(img);
+				img.onerror = () => resolve(null);// エラーでも resolve
+			});
+		} catch (e) {
+			return null;
+		}
+	};
 
-		// 読み込み完了を待つ（表示エラーも検知）
-		await new Promise(resolve => {
-			img.onload = resolve;
-			img.onerror = resolve;
-		});
-
-		preloadQueue.push(img); // バッファに追加
+	// バッファ不足分だけ同時取得
+	const tasks = [];
+	while (preloadQueue.length + tasks.length < BUFFER_SIZE) {
+		tasks.push(fetchImage());
 	}
-	//ここでチェック追加：最低1枚貯まったらメッセージを非表示
+
+	const results = await Promise.all(tasks);
+	results.forEach(img => {
+		if (img) preloadQueue.push(img);
+	});
+
+	// バッファに最低1枚あればメッセージを非表示
 	if (preloadQueue.length >= 1) {
 		errorMsg.style.display = "none";
 	}
@@ -136,39 +153,39 @@ async function fillPreloadBuffer() {
 
 // ギャラリーモードのサムネイル表示生成
 function renderGallery() {
-    const gallery = document.getElementById("galleryContainer");
-    gallery.innerHTML = ""; // ← 前の表示を消す
+	const gallery = document.getElementById("galleryContainer");
+	gallery.innerHTML = ""; // ← 前の表示を消す
 
-    const maxPage = Math.ceil(shownImages.length / 9);
-    for (let page = 0; page < maxPage; page++) {
-        const group = document.createElement("div");
-        group.style.display = "grid";
-        group.style.gridTemplateColumns = "repeat(3, 1fr)";
-        group.style.gridGap = "16px";
-        group.style.scrollSnapAlign = "start";
-        group.style.minWidth = "100%";
-        group.style.padding = "20px";
+	const maxPage = Math.ceil(shownImages.length / 9);
+	for (let page = 0; page < maxPage; page++) {
+		const group = document.createElement("div");
+		group.style.display = "grid";
+		group.style.gridTemplateColumns = "repeat(3, 1fr)";
+		group.style.gridGap = "16px";
+		group.style.scrollSnapAlign = "start";
+		group.style.minWidth = "100%";
+		group.style.padding = "20px";
 
-        const start = page * 9;
-        const end = start + 9;
-        const pageImages = shownImages.slice(start, end);
+		const start = page * 9;
+		const end = start + 9;
+		const pageImages = shownImages.slice(start, end);
 
-        pageImages.forEach(url => {
-            const thumb = document.createElement("img");
-            thumb.src = url;
-            thumb.style.width = "120px";
-            thumb.style.height = "80px";
-            thumb.style.objectFit = "cover";
-            thumb.style.borderRadius = "6px";
-            thumb.style.cursor = "pointer";
-            thumb.addEventListener("click", () => showModal(url));
-            group.appendChild(thumb);
-        });
+		pageImages.forEach(url => {
+			const thumb = document.createElement("img");
+			thumb.src = url;
+			thumb.style.width = "120px";
+			thumb.style.height = "80px";
+			thumb.style.objectFit = "cover";
+			thumb.style.borderRadius = "6px";
+			thumb.style.cursor = "pointer";
+			thumb.addEventListener("click", () => showModal(url));
+			group.appendChild(thumb);
+		});
 
-        gallery.appendChild(group);
-    }
+		gallery.appendChild(group);
+	}
 
-    updateSliderEvents();
+	updateSliderEvents();
 }
 
 
